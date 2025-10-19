@@ -513,26 +513,26 @@ function Install-AppWithWinGet {
 $appxPackages = @(
     'Microsoft.Microsoft3DViewer', 'Microsoft.BingSearch', 'Microsoft.WindowsCamera', 'Clipchamp.Clipchamp',
     'Microsoft.WindowsAlarms', 'Microsoft.549981C3F5F10', 'Microsoft.Windows.DevHome',
-    'MicrosoftCorporationII.MicrosoftFamily', 'Microsoft.WindowsFeedbackHub', 'Microsoft.GetHelp',
+    'MicrosoftCorporationII.MicrosoftFamily', 'Microsoft.WindowsFeedbackHub',
     'microsoft.windowscommunicationsapps', 'Microsoft.WindowsMaps', 'Microsoft.ZuneVideo',
     'Microsoft.BingNews', 'Microsoft.MicrosoftOfficeHub', 'Microsoft.Office.OneNote',
     'Microsoft.OutlookForWindows', 'Microsoft.People', 'Microsoft.Windows.Photos',
     'Microsoft.PowerAutomateDesktop', 'MicrosoftCorporationII.QuickAssist', 'Microsoft.SkypeApp',
     'Microsoft.MicrosoftSolitaireCollection', 'Microsoft.MicrosoftStickyNotes', 'MSTeams',
     'Microsoft.Getstarted', 'Microsoft.Todos', 'Microsoft.WindowsSoundRecorder', 'Microsoft.BingWeather',
-    'Microsoft.ZuneMusic', 'Microsoft.WindowsTerminal', 'Microsoft.Xbox.TCUI', 'Microsoft.XboxApp',
+    'Microsoft.ZuneMusic', 'Microsoft.Xbox.TCUI', 'Microsoft.XboxApp',
     'Microsoft.XboxGameOverlay', 'Microsoft.XboxGamingOverlay', 'Microsoft.XboxIdentityProvider',
     'Microsoft.XboxSpeechToTextOverlay', 'Microsoft.GamingApp', 'Microsoft.YourPhone', 'Microsoft.OneDrive',
     'Microsoft.549981C3F5F10', 'Microsoft.MixedReality.Portal', 'Microsoft.ScreenSketch'
     'Microsoft.Windows.Ai.Copilot.Provider', 'Microsoft.Copilot', 'Microsoft.Copilot_8wekyb3d8bbwe',
-    'Microsoft.WindowsMeetNow', 'Microsoft.WindowsStore', 'Microsoft.Paint', 'Microsoft.MSPaint'
+    'Microsoft.WindowsMeetNow', 'Microsoft.Paint', 'Microsoft.MSPaint'
 )
 
 # Define Windows Capabilities
 $capabilities = @(
-    'Browser.InternetExplorer', 'MathRecognizer', 'OpenSSH.Client',
-    'Microsoft.Windows.PowerShell.ISE', 'App.Support.QuickAssist', 'App.StepsRecorder',
-    'Media.WindowsMediaPlayer', 'Microsoft.Windows.WordPad', 'Microsoft.Windows.MSPaint'
+    'Browser.InternetExplorer', 'MathRecognizer','Microsoft.Windows.PowerShell.ISE',
+    'App.Support.QuickAssist', 'App.StepsRecorder', 'Microsoft.Windows.WordPad',
+    'Microsoft.Windows.MSPaint', 'Microsoft.Windows.WordPad'
 )
 
 # Apply registry mods to prevent reinstallation and disable features
@@ -1826,10 +1826,6 @@ Windows Registry Editor Version 5.00
 "NoInstrumentation"=-
 "HideSCAMeetNow"=dword:00000001
 
-; remove search from taskbar
-[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search]
-"SearchboxTaskbarMode"=dword:00000000
-
 ; disable use dynamic lighting on my devices
 ; disable compatible apps in the forground always control lighting
 ; disable match my windows accent color
@@ -2234,10 +2230,6 @@ Windows Registry Editor Version 5.00
 [-HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Explorer]
 
 [-HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer]
-
-; search from taskbar
-[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search]
-"SearchboxTaskbarMode"=-
 
 ; meet now
 [-HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer]
