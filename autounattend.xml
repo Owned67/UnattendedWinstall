@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
-  <!-- UnattendedWinstall https://github.com/memstechtips/UnattendedWinstall -->
+  <!-- UnattendedWinstall https://github.com/Owned67/UnattendedWinstall -->
   <settings pass="offlineServicing"></settings>
     <settings pass="windowsPE">
+        <component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <SetupUILanguage>
+                <UILanguage>fr-FR</UILanguage>
+            </SetupUILanguage>
+            <InputLocale>040c:0000040c</InputLocale>
+            <SystemLocale>fr-FR</SystemLocale>
+            <UILanguage>fr-FR</UILanguage>
+            <UILanguageFallback>fr-FR</UILanguageFallback>
+            <UserLocale>fr-FR</UserLocale>
+    </component>
     <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
       <UserData>
         <ProductKey>
@@ -11,49 +21,61 @@
         <AcceptEula>true</AcceptEula>
       </UserData>
       <RunSynchronous>
-        <RunSynchronousCommand wcm:action="add">
+      <RunSynchronousCommand wcm:action="add">
           <Order>1</Order>
-          <Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassTPMCheck /t REG_DWORD /d 1 /f</Path>
-        </RunSynchronousCommand>
-        <RunSynchronousCommand wcm:action="add">
+          <Path>cmd.exe /c "&gt;&gt;"X:\diskpart.txt" (echo:SELECT DISK=0&amp;echo:CLEAN&amp;echo:CONVERT GPT&amp;echo:CREATE PARTITION EFI SIZE=300&amp;echo:FORMAT QUICK FS=FAT32 LABEL=^"System^"&amp;echo:CREATE PARTITION MSR SIZE=16&amp;echo:CREATE PARTITION PRIMARY&amp;echo:SHRINK MINIMUM=1000)"</Path>
+      </RunSynchronousCommand>
+      <RunSynchronousCommand wcm:action="add">
           <Order>2</Order>
-          <Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassSecureBootCheck /t REG_DWORD /d 1 /f</Path>
+          <Path>cmd.exe /c "&gt;&gt;"X:\diskpart.txt" (echo:FORMAT QUICK FS=NTFS LABEL=^"Windows^"&amp;echo:CREATE PARTITION PRIMARY&amp;echo:FORMAT QUICK FS=NTFS LABEL=^"Recovery^"&amp;echo:SET ID=^"de94bba4-06d1-4d40-a16a-bfd50179d6ac^"&amp;echo:GPT ATTRIBUTES=0x8000000000000001)"</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
           <Order>3</Order>
-          <Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassStorageCheck /t REG_DWORD /d 1 /f</Path>
+          <Path>cmd.exe /c "diskpart.exe /s "X:\diskpart.txt" &gt;&gt;"X:\diskpart.log" || ( type "X:\diskpart.log" &amp; echo diskpart encountered an error. &amp; pause &amp; exit /b 1 )"</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
           <Order>4</Order>
-          <Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassCPUCheck /t REG_DWORD /d 1 /f</Path>
+          <Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassTPMCheck /t REG_DWORD /d 1 /f</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
           <Order>5</Order>
-          <Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassRAMCheck /t REG_DWORD /d 1 /f</Path>
+          <Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassSecureBootCheck /t REG_DWORD /d 1 /f</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
           <Order>6</Order>
+          <Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassStorageCheck /t REG_DWORD /d 1 /f</Path>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>7</Order>
+          <Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassCPUCheck /t REG_DWORD /d 1 /f</Path>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>8</Order>
+          <Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassRAMCheck /t REG_DWORD /d 1 /f</Path>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>9</Order>
           <Path>reg.exe add "HKLM\SYSTEM\Setup\LabConfig" /v BypassDiskCheck /t REG_DWORD /d 1 /f</Path>
         </RunSynchronousCommand>
         <!--Prevents auto detection of Windows Edition and forces Windows Setup to show all available Editions of Windows during setup.-->
         <RunSynchronousCommand wcm:action="add">
-          <Order>7</Order>
+          <Order>10</Order>
           <Path>cmd.exe /c del /f /q X:\Sources\ei.cfg</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
-          <Order>8</Order>
+          <Order>11</Order>
           <Path>cmd.exe /c echo [Channel] > X:\Sources\ei.cfg</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
-          <Order>9</Order>
+          <Order>12</Order>
           <Path>cmd.exe /c echo _Default >> X:\Sources\ei.cfg</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
-          <Order>10</Order>
+          <Order>13</Order>
           <Path>cmd.exe /c echo [VL] >> X:\Sources\ei.cfg</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
-          <Order>11</Order>
+          <Order>14</Order>
           <Path>cmd.exe /c echo 0 >> X:\Sources\ei.cfg</Path>
         </RunSynchronousCommand>
       </RunSynchronous>
@@ -61,6 +83,13 @@
   </settings>
   <settings pass="generalize"></settings>
   <settings pass="specialize">
+    <component name="Microsoft-Windows-Security-SPP-UX" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+        <SkipAutoActivation>true</SkipAutoActivation>
+    </component>
+    <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+        <ComputerName>W11-Revolution</ComputerName>
+        <TimeZone>Romance Standard Time</TimeZone>
+    </component>
     <component name="Microsoft-Windows-Deployment" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
       <RunSynchronous>
         <RunSynchronousCommand wcm:action="add">
@@ -70,67 +99,85 @@
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
           <Order>2</Order>
+          <Description>Bloquer MAJ 25H2</Description>
+          <Path>reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v TargetReleaseVersion /t REG_DWORD /d 1 /f</Path>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>3</Order>
+          <Description>Définir version cible 24H2</Description>
+          <Path>reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v TargetReleaseVersionInfo /t REG_SZ /d 24H2 /f</Path>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>4</Order>
+          <Description>Définir produit Windows 11</Description>
+          <Path>reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v ProductVersion /t REG_SZ /d "Windows 11" /f</Path>
+        </RunSynchronousCommand><RunSynchronousCommand wcm:action="add">
+          <Order>5</Order>
+          <Path>reg.exe add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE /v BypassNRO /t reg_dword /d 1 /f</Path>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>6</Order>
           <!-- Disables User Account Control -->
           <Path>reg.exe add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableLUA /t REG_DWORD /d 0 /f</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
-          <Order>3</Order>
+          <Order>7</Order>
           <!-- Enables Running of PowerShell Scripts -->
           <Path>powershell.exe -NoProfile -WindowStyle Hidden -Command "Set-ExecutionPolicy RemoteSigned -Scope LocalMachine -Force"</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
-          <Order>4</Order>
+          <Order>8</Order>
           <!-- Skips Forced Microsoft Account Creation -->
           <Path>reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE" /v BypassNRO /t REG_DWORD /d 1 /f</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
-          <Order>5</Order>
+          <Order>9</Order>
           <!-- Runs Script to Enable .NET3.5 from Windows Installation Media -->
-          <Path>powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\Windows\Temp\DotNet.ps1"</Path>
+          <Path>powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\Windows\Setup\Scripts\DotNet.ps1"</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
-          <Order>6</Order>
+          <Order>10</Order>
           <!-- Creates Specialize Phase Marker File -->
           <Path>cmd.exe /c echo Specialized Setup > "C:\specialize_marker.txt"</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
-          <Order>7</Order>
+          <Order>11</Order>
           <!-- Runs Recommended UnattendedWinstall Scripts -->
           <Path>powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\Windows\Setup\Scripts\UWScript.ps1"</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
-          <Order>8</Order>
+          <Order>12</Order>
           <!-- Creates UnattendedWinstall Script Shortcut on Desktop -->
           <Path>powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\Windows\Temp\UWScriptShortcut.ps1"</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
-          <Order>9</Order>
+          <Order>13</Order>
           <!-- Loads Default User Registry Hive to Make Changes to it -->
           <Path>reg.exe load "HKU\DefaultUser" "C:\Users\Default\NTUSER.DAT"</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
-          <Order>10</Order>
+          <Order>14</Order>
           <!-- Add Registry Key to Run User Account Customization Script -->
           <Path>reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Runonce" /v "CurrentUser" /t REG_SZ /d "cmd.exe /c powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File \"C:\Users\Default\User Customization.ps1\"" /f</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
-          <Order>11</Order>
+          <Order>15</Order>
           <!-- Unloads Default User Registry Hive. -->
           <Path>reg.exe unload "HKU\DefaultUser"</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
           <!-- Cleanup temporary .ps1 and .reg scripts inside C:\Windows\Temp -->
-          <Order>12</Order>
+          <Order>16</Order>
           <Path>cmd /c del /f /q "C:\Windows\Temp\*.ps1" "C:\Windows\Temp\*.reg"</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
-          <Order>13</Order>
+          <Order>17</Order>
           <!-- Deletes Specialize Phase Marker File -->
           <Path>cmd.exe /c del /q "C:\specialize_marker.txt"</Path>
         </RunSynchronousCommand>
         <RunSynchronousCommand wcm:action="add">
           <!-- Disable All Network Adapters Temporarily so Windows Doesn't Update During OOBE -->
-          <Order>14</Order>
+          <Order>18</Order>
           <Path>powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -Command "Get-NetAdapter | Disable-NetAdapter -Confirm:$false"</Path>
         </RunSynchronousCommand>
       </RunSynchronous>
@@ -139,7 +186,34 @@
   <settings pass="auditSystem"></settings>
   <settings pass="auditUser"></settings>
   <settings pass="oobeSystem">
+    <component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+        <InputLocale>040c:0000040c</InputLocale>
+        <SystemLocale>fr-FR</SystemLocale>
+        <UILanguage>fr-FR</UILanguage>
+        <UserLocale>fr-FR</UserLocale>
+    </component>
     <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+      <UserAccounts>
+        <LocalAccounts>
+          <LocalAccount wcm:action="add">
+            <Name>Eric</Name>
+            <Group>Administrators</Group>
+            <Password>
+            <Value>mettreunmotdepasse</Value>
+            <PlainText>true</PlainText>
+            </Password>
+          </LocalAccount>
+        </LocalAccounts>
+      </UserAccounts>
+      <AutoLogon>
+        <Username>Eric</Username>
+        <Enabled>true</Enabled>
+        <LogonCount>1</LogonCount>
+         <Password>
+           <Value>mettreunmotdepasse</Value>
+           <PlainText>true</PlainText>
+         </Password>
+      </AutoLogon>
       <OOBE>
         <HideEULAPage>true</HideEULAPage>
         <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
@@ -158,7 +232,7 @@
     </component>
   </settings>
   <Extensions>
-    <ExtractScript>
+<!--    <ExtractScript>
 param(
     [xml] $Document
 );
@@ -178,8 +252,25 @@ foreach( $file in $Document.unattend.Extensions.File ) {
     };
     [System.IO.File]::WriteAllBytes( $path, ( $encoding.GetPreamble() + $encoding.GetBytes( $file.InnerText.Trim() ) ) );
 }
-		</ExtractScript>
-    <File path="C:\Windows\Temp\DotNet.ps1">
+		</ExtractScript>-->
+    <ExtractScript>
+param(
+    [xml] $Document
+);
+
+foreach( $file in $Document.unattend.Extensions.File ) {
+    $path = [System.Environment]::ExpandEnvironmentVariables( $file.GetAttribute( 'path' ) );
+    mkdir -Path( $path | Split-Path -Parent ) -ErrorAction 'SilentlyContinue';
+    $encoding = switch( [System.IO.Path]::GetExtension( $path ) ) {
+        { $_ -in '.ps1', '.xml' } { [System.Text.Encoding]::UTF8; }
+        { $_ -in '.reg', '.vbs', '.js' } { [System.Text.UnicodeEncoding]::new( $false, $true ); }
+        default { [System.Text.Encoding]::Default; }
+    };
+    $bytes = $encoding.GetPreamble() + $encoding.GetBytes( $file.InnerText.Trim() );
+    [System.IO.File]::WriteAllBytes( $path, $bytes );
+}
+	</ExtractScript>
+    <File path="C:\Windows\Setup\Scripts\DotNet.ps1">
       <![CDATA[
 function Enable-DotNetFramework {
     $sourceFound = $false

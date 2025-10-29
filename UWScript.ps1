@@ -530,7 +530,7 @@ $appxPackages = @(
 
 # Define Windows Capabilities
 $capabilities = @(
-    'Browser.InternetExplorer', 'MathRecognizer','Microsoft.Windows.PowerShell.ISE',
+    'MathRecognizer','Microsoft.Windows.PowerShell.ISE',
     'App.Support.QuickAssist', 'App.StepsRecorder', 'Microsoft.Windows.WordPad',
     'Microsoft.Windows.MSPaint', 'Microsoft.Windows.WordPad'
 )
