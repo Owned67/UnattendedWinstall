@@ -399,7 +399,7 @@ function Show-Header {
 function Show-MainMenu {
     Show-Header
     Write-Host "Main Menu:" -ForegroundColor Yellow
-    Write-Host "1. Software & Apps"
+    Write-Host "1. Apps"
     Write-Host "2. Privacy & Security"
     Write-Host "3. Windows Updates"
     Write-Host "4. Optimize Registry"
@@ -471,34 +471,9 @@ function Show-Menu {
 # 1. Software & Apps Menu
 function Show-SoftwareMenu {
     Show-Menu -menuTitle "Software & Apps" `
-        -options @("Install Software", "Remove Bloatware Apps") `
+        -options @("Remove Bloatware Apps") `
         -actions @{
-        "1" = { Show-AppInstallMenu }
-        "2" = { Show-AppRemovalMenu }
-    } `
-        -showHeader
-}
-
-# Install Software Menu
-function Show-AppInstallMenu {
-    Show-Menu -menuTitle "Select an app to install" `
-        -options @("Microsoft Store", "Browser Menu", "UniGetUI (Software Manager)") `
-        -actions @{
-        "1" = { Install-Store }
-        "2" = { Show-BrowserInstallMenu }
-        "3" = { Install-AppWithWinGet -AppName "MartiCliment.UniGetUI" -FriendlyName "UniGetUI (Software Manager)" }
-    } `
-        -showHeader
-}
-function Show-BrowserInstallMenu {
-    Show-Menu -menuTitle "Select a Browser to install" `
-        -options @("Thorium Browser", "Mozilla Firefox", "Microsoft Edge", "Google Chrome", "Brave Browser") `
-        -actions @{
-        "1" = { Install-AppWithWinGet -AppName "Alex313031.Thorium" -FriendlyName "Thorium Browser" } 
-        "2" = { Install-AppWithWinGet -AppName "Mozilla.Firefox" -FriendlyName "Mozilla Firefox" }
-        "3" = { Install-AppWithWinGet -AppName "Microsoft.Edge" -FriendlyName "Microsoft Edge" }
-        "4" = { Install-AppWithWinGet -AppName "Google.Chrome" -FriendlyName "Google Chrome" }
-        "5" = { Install-AppWithWinGet -AppName "Brave.Brave" -FriendlyName "Brave Browser" }  
+        "1" = { Show-AppRemovalMenu }
     } `
         -showHeader
 }
@@ -835,88 +810,23 @@ function Install-AppWithWinGet {
 $appxPackages = @(
     'Microsoft.Microsoft3DViewer', 'Microsoft.BingSearch', 'Microsoft.WindowsCamera', 'Clipchamp.Clipchamp',
     'Microsoft.WindowsAlarms', 'Microsoft.549981C3F5F10', 'Microsoft.Windows.DevHome',
-    'MicrosoftCorporationII.MicrosoftFamily', 'Microsoft.WindowsFeedbackHub', 'Microsoft.GetHelp',
+    'MicrosoftCorporationII.MicrosoftFamily', 'Microsoft.WindowsFeedbackHub',
     'microsoft.windowscommunicationsapps', 'Microsoft.WindowsMaps', 'Microsoft.ZuneVideo',
     'Microsoft.BingNews', 'Microsoft.MicrosoftOfficeHub', 'Microsoft.Office.OneNote',
     'Microsoft.OutlookForWindows', 'Microsoft.People', 'Microsoft.Windows.Photos',
     'Microsoft.PowerAutomateDesktop', 'MicrosoftCorporationII.QuickAssist', 'Microsoft.SkypeApp',
     'Microsoft.MicrosoftSolitaireCollection', 'Microsoft.MicrosoftStickyNotes', 'MSTeams',
     'Microsoft.Getstarted', 'Microsoft.Todos', 'Microsoft.WindowsSoundRecorder', 'Microsoft.BingWeather',
-    'Microsoft.ZuneMusic', 'Microsoft.WindowsTerminal', 'Microsoft.Xbox.TCUI', 'Microsoft.XboxApp',
-    'Microsoft.XboxGameOverlay', 'Microsoft.XboxGamingOverlay', 'Microsoft.XboxIdentityProvider',
-    'Microsoft.XboxSpeechToTextOverlay', 'Microsoft.GamingApp', 'Microsoft.YourPhone', 'Microsoft.OneDrive',
-    'Microsoft.549981C3F5F10', 'Microsoft.MixedReality.Portal', 'Microsoft.ScreenSketch'
+    'Microsoft.ZuneMusic', 'Microsoft.549981C3F5F10', 'Microsoft.MixedReality.Portal', 'Microsoft.ScreenSketch',
     'Microsoft.Windows.Ai.Copilot.Provider', 'Microsoft.Copilot', 'Microsoft.Copilot_8wekyb3d8bbwe',
-    'Microsoft.WindowsMeetNow', 'Microsoft.WindowsStore', 'Microsoft.Paint', 'Microsoft.MSPaint'
+    'Microsoft.WindowsMeetNow', 'Microsoft.Paint', 'Microsoft.MSPaint'
 )
 
 # Define Windows Capabilities
 $capabilities = @(
-    'MathRecognizer', 'OpenSSH.Client',
-    'Microsoft.Windows.PowerShell.ISE', 'App.Support.QuickAssist', 'App.StepsRecorder',
-    'Media.WindowsMediaPlayer', 'Microsoft.Windows.WordPad', 'Microsoft.Windows.MSPaint'
+    'MathRecognizer', 'App.Support.QuickAssist', 'App.StepsRecorder',
+    'Microsoft.Windows.WordPad', 'Microsoft.Windows.MSPaint'
 )
-
-# Apply registry mods to prevent reinstallation and disable features
-function Set-AppsRegistry {
-    $MultilineComment = @"
-Windows Registry Editor Version 5.00
-
-; --Application and Feature Restrictions--
-
-; Disable Windows Copilot system-wide
-[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot]
-"TurnOffWindowsCopilot"=dword:00000001
-
-; Prevents Dev Home Installation
-[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe\DevHomeUpdate]
-
-; Prevents New Outlook for Windows Installation
-[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WindowsUpdate\Orchestrator\UScheduler_Oobe\OutlookUpdate]
-
-; Prevents Chat Auto Installation
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Communications]
-"ConfigureChatAutoInstall"=dword:00000000
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Chat]
-"ChatIcon"=dword:00000003
-
-; Disables Cortana
-[HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Windows Search]
-"AllowCortana"=dword:00000000
-
-; Disables OneDrive Automatic Backups of Important Folders (Documents, Pictures etc.)
-[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\OneDrive]
-"KFMBlockOptIn"=dword:00000001
-"@
-    Set-Content -Path "$env:TEMP\Windows_Apps.reg" -Value $MultilineComment -Force -ErrorAction SilentlyContinue
-    Regedit.exe /S "$env:TEMP\Windows_Apps.reg" -Force -ErrorAction SilentlyContinue
-}
-
-# Removes OneDrive during Windows Installation
-function Remove-OneDrive {
-    Remove-Item "C:\Users\Default\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\OneDrive.lnk" -ErrorAction SilentlyContinue
-    Remove-Item "C:\Users\Default\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\OneDrive.exe" -ErrorAction SilentlyContinue
-    Remove-Item "C:\Windows\System32\OneDriveSetup.exe" -ErrorAction SilentlyContinue
-    Remove-Item "C:\Windows\SysWOW64\OneDriveSetup.exe" -ErrorAction SilentlyContinue
-}
-
-# Uninstalls OneDrive in existing Windows Installation
-function Uninstall-OneDrive {
-    # stop onedrive running
-    Stop-Process -Force -Name OneDrive -ErrorAction SilentlyContinue | Out-Null
-    # uninstall onedrive w10
-    cmd /c "C:\Windows\SysWOW64\OneDriveSetup.exe -uninstall >nul 2>&1"
-    # clean onedrive w10 
-    Get-ScheduledTask | Where-Object { $_.Taskname -match 'OneDrive' } | Unregister-ScheduledTask -Confirm:$false
-    # uninstall onedrive w11
-    cmd /c "C:\Windows\System32\OneDriveSetup.exe -uninstall >nul 2>&1"
-}
-
-# Disables Recall
-function Disable-Recall {
-    Dism /Online /Disable-Feature /Featurename:Recall /NoRestart | Out-Null
-}
 
 # Remove All Bloatware (UWP) Apps from Windows.
 function Remove-Apps {
@@ -938,11 +848,6 @@ function Remove-Apps {
         Where-Object { $capabilities -contains ($_.Name -split '~')[0] } |
         Remove-WindowsCapability -Online -ErrorAction SilentlyContinue | Out-Null
         # Calls specified functions
-        Show-Header
-        Set-AppsRegistry
-        Uninstall-OneDrive
-        Show-Header
-        Disable-Recall
         Show-Header
         Write-Host "Pre-installed Apps and Features removed successfully." -BackgroundColor Green
         Wait-IfNotSpecialize
@@ -1074,72 +979,6 @@ function Get-UACStatus {
         default { Write-Host "Invalid choice. Try again."; Get-UACStatus }
     }
 }
-
-
-# Function to Apply the Recommended Privacy Settings
-function Set-RecommendedPrivacySettings {
-    
-    if (-not $isSpecializePhase) {
-        Show-Header
-        Write-Host "Applying Recommended Privacy Settings . . ."
-    }
-
-    $MultilineComment = @"
-Windows Registry Editor Version 5.00
-
-; --Privacy and Security Settings--
-
-; Disables Activity History
-[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\System]
-"EnableActivityFeed"=dword:00000000
-"PublishUserActivities"=dword:00000000
-"UploadUserActivities"=dword:00000000
-
-; Disables Location Tracking
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location]
-"Value"="Deny"
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}]
-"SensorPermissionState"=dword:00000000
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration]
-"Status"=dword:00000000
-
-[HKEY_LOCAL_MACHINE\SYSTEM\Maps]
-"AutoUpdateEnabled"=dword:00000000
-
-; Disables Telemetry
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection]
-"AllowTelemetry"=dword:00000000
-
-; Disables Telemetry and Feedback Notifications
-[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection]
-"AllowTelemetry"=dword:00000000
-"DoNotShowFeedbackNotifications"=dword:00000001
-
-; Disables Windows Ink Workspace
-[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsInkWorkspace]
-"AllowWindowsInkWorkspace"=dword:00000000
-
-; Disables the Advertising ID for All Users
-[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo]
-"DisabledByGroupPolicy"=dword:00000001
-
-; Disable Account Info
-[HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userAccountInformation]
-"Value"="Deny"
-"@
-    # Write the registry changes to a file and silently import it using regedit
-    Set-Content -Path "$env:TEMP\Recommended_Privacy_Settings.reg" -Value $MultilineComment -Force
-    Start-Process -FilePath "regedit.exe" -ArgumentList "/S `"$env:TEMP\Recommended_Privacy_Settings.reg`"" -NoNewWindow -Wait
-
-    if (-not $isSpecializePhase) {
-        Show-Header
-        Write-Host "Recommended Privacy Settings Applied." -ForegroundColor Green
-        Wait-IfNotSpecialize
-    }
-}
-
 
 # Function to Apply the Default Privacy Settings
 function Set-DefaultPrivacySettings {
@@ -1449,11 +1288,6 @@ Windows Registry Editor Version 5.00
 [HKEY_LOCAL_MACHINE\System\ControlSet001\Control\Network\SharedAccessConnection]
 "EnableControl"=dword:00000000
 
-; SYSTEM AND SECURITY
-; adjust for best performance of programs
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\PriorityControl]
-"Win32PrioritySeparation"=dword:00000026
-
 ; disable remote assistance
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Remote Assistance]
 "fAllowToGetHelp"=dword:00000000
@@ -1462,11 +1296,6 @@ Windows Registry Editor Version 5.00
 ; disable automatic maintenance
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance]
 "MaintenanceDisabled"=dword:00000001
-
-; SECURITY AND MAINTENANCE
-; disable report problems
-[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting]
-"Disabled"=dword:00000001
 
 ; ACCOUNTS
 ; disable use my sign in info after restart
@@ -1484,14 +1313,6 @@ Windows Registry Editor Version 5.00
 "HideSCAMeetNow"=dword:00000001
 "NoStartMenuMFUprogramsList"=-
 "NoInstrumentation"=-
-
-; remove windows widgets from taskbar
-[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Dsh] 
-"AllowNewsAndInterests"=dword:00000000
-
-; remove news and interests from Taskbar
-[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds]
-"EnableFeeds"=dword:00000000
 
 ; SYSTEM
 ; turn on hardware accelerated gpu scheduling
@@ -2669,11 +2490,12 @@ Windows Registry Editor Version 5.00
 function Set-ServiceStartup {
     # List of services to set to Disabled
     $disabledServices = @(
-    'AJRouter', 'AppVClient', 'AssignedAccessManagerSvc', 
-    'DiagTrack', 'DialogBlockingService', 'NetTcpPortSharing',
-    'RemoteAccess', 'RemoteRegistry', 'shpamsvc', 
-    'ssh-agent', 'tzautoupdate', 'uhssvc',
-    'UevAgentService'
+    'AJRouter', 'bam', 'dam', 'TrkWks', 'lmhosts', 'SCardSvr',
+    'RasAuto', 'SmsRouter', 'MSiSCSI', 'ScDeviceEnum', 'RemoteRegistry', 
+    'RemoteAccess', 'lfsvc', 'MapsBroker', 'DiagTrack',
+    'WpcMonSvc', 'RetailDemo', 'SCPolicySvc', 'TermService',
+    'SessionEnv','DusmSvc', 'dmwappushservice', 
+    'NVDisplay.ContainerLocalSystem'
 	)
 
     # List of services to set to Manual
@@ -2689,17 +2511,16 @@ function Set-ServiceStartup {
     'FrameServerMonitor', 'GraphicsPerfSvc', 'HomeGroupListener', 
     'HomeGroupProvider', 'HvHost', 'IEEtwCollectorService', 'IKEEXT',
     'InstallService', 'InventorySvc', 'IpxlatCfgSvc', 'KtmRm', 'LicenseManager',
-    'LxpSvc', 'MSDTC', 'MSiSCSI', 'MapsBroker', 'McpManagementService', 
+    'LxpSvc', 'MSDTC', 'McpManagementService', 
     'MessagingService_*', 'MicrosoftEdgeElevationService', 
     'MixedRealityOpenXRSvc', 'MsKeyboardFilter', 'NPSMSvc_*', 'NaturalAuthentication',
     'NcaSvc', 'NcbService', 'NcdAutoSetup', 'Netman', 'NgcCtnrSvc', 'NgcSvc',
     'NlaSvc', 'P9RdrService_*', 'PNRPAutoReg', 'PNRPsvc', 'PcaSvc', 'PeerDistSvc',
-    'PenService_*', 'PerfHost', 'PhoneSvc', 'PimIndexMaintenanceSvc_*', 'PlugPlay',
+    'PenService_*', 'PerfHost', 'PimIndexMaintenanceSvc_*', 'PlugPlay',
     'PolicyAgent', 'PrintNotify', 'PrintWorkflowUserSvc_*', 'PushToInstall', 'QWAVE',
-    'RasAuto', 'RasMan', 'RetailDemo', 'RmSvc', 'RpcLocator', 'SCPolicySvc',
-    'SCardSvr', 'SDRSVC', 'SEMgrSvc', 'SecurityHealthService', 
-    'SensorDataService', 'SensorService', 'SensrSvc', 'SessionEnv', 
-    'SharedAccess', 'SharedRealitySvc', 'SmsRouter', 'SstpSvc', 
+    'RmSvc', 'RpcLocator', 'SDRSVC', 'SEMgrSvc', 'SecurityHealthService', 
+    'SensorDataService', 'SensorService', 'SensrSvc',
+    'SharedAccess', 'SharedRealitySvc', 'SstpSvc', 
     'StateRepository', 'StiSvc', 'StorSvc', 'TabletInputService', 'TapiSrv',
     'TextInputManagementService', 'TieringEngineService', 'TimeBroker',
     'TimeBrokerSvc', 'TokenBroker', 'TroubleshootingSvc', 'TrustedInstaller',
@@ -2708,19 +2529,15 @@ function Set-ServiceStartup {
     'WFDSConMgrSvc', 'WMPNetworkSvc', 'WManSvc', 'WPDBusEnum', 'WSService',
     'WSearch', 'WaaSMedicSvc', 'WalletService', 'WarpJITSvc', 'WbioSrvc',
     'WcsPlugInService', 'WdiServiceHost', 'WdiSystemHost', 'WebClient', 'Wecsvc',
-    'WerSvc', 'WiaRpc', 'WinHttpAutoProxySvc', 'WinRM', 'WpcMonSvc', 
+    'WerSvc', 'WiaRpc', 'WinHttpAutoProxySvc', 'WinRM',
     'WpnService', 'WwanSvc', 'XblAuthManager', 'XblGameSave', 'XboxGipSvc', 
     'XboxNetApiSvc', 'autotimesvc', 'bthserv', 'camsvc', 'cbdhsvc_*',
     'cloudidsvc', 'dcsvc', 'defragsvc', 'diagnosticshub.standardcollector.service',
     'diagsvc', 'dmwappushservice', 'dot3svc', 'edgeupdate', 'edgeupdatem', 
-    'embeddedmode', 'fdPHost', 'fhsvc', 'hidserv', 'icssvc', 'lfsvc', 
-    'lltdsvc', 'lmhosts', 'msiserver', 'netprofm', 'p2pimsvc', 'p2psvc', 
+    'embeddedmode', 'fdPHost', 'fhsvc', 'hidserv', 'icssvc',
+    'lltdsvc', 'msiserver', 'netprofm', 'p2pimsvc', 'p2psvc', 
     'perceptionsimulation', 'pla', 'seclogon', 'smphost', 'spectrum', 
-    'sppsvc', 'svsvc', 'swprv', 'upnphost', 'vds', 'vm3dservice', 
-    'vmicguestinterface', 'vmicheartbeat', 'vmickvpexchange', 'vmicrdv', 
-    'vmicshutdown', 'vmictimesync', 'vmicvmsession', 'vmicvss', 'wbengine', 
-    'wcncsvc', 'webthreatdefsvc', 'wercplsupport', 'wisvc', 'wlidsvc', 
-    'wlpasvc', 'wmiApSrv', 'workfolderssvc', 'wuauserv', 'wudfsvc'
+    'sppsvc', 'svsvc', 'swprv', 'upnphost', 'vds', 'vm3dservice'
     )
 
     # Set the services in the disabledServices list to Disabled
@@ -2991,10 +2808,6 @@ if (Test-Path -Path $markerFilePath) {
     Remove-WindowsCapability -Online -ErrorAction SilentlyContinue
     # Additional Software & Apps
     Set-AppsRegistry
-    Remove-OneDrive
-    Disable-Recall
-    # Privacy & Security
-    Set-RecommendedPrivacySettings
     # Windows Updates
     Set-RecommendedUpdateSettings
     # Optimize Registry
